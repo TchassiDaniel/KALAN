@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gdsc_1_win/SinglePost.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,13 +35,11 @@ class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   int indexElementBarreNavigation = 1;
   double tailleBarreNavigation = 100;
-  late TabController _controller;
-  late Container mainContent;
+  late Widget mainContent;
 
   @override
   void initState() {
     super.initState();
-    _controller = TabController(length: 2, vsync: this);
   }
 
 //Gestionnaire de passage entre écran
@@ -48,16 +47,18 @@ class _MyHomePageState extends State<MyHomePage>
     if (indexElementBarreNavigation == 1) {
       mainContent = pageNewPost();
     } else if (indexElementBarreNavigation == 2) {
-      mainContent = pagePost();
+      mainContent = SinglePost(
+        tailleBarreNavigation: tailleBarreNavigation,
+      );
     }
   }
 
 //Container d'ajout d'élément
   Container pageNewPost() {
-    num? typeBottle;
+    String? typeBottle;
     String? localisation;
     num? quantite;
-    String? meetingPoint;
+    String meetingPoint;
 
     return Container(
       height: MediaQuery.sizeOf(context).height - 270,
@@ -154,14 +155,14 @@ class _MyHomePageState extends State<MyHomePage>
                     DropdownButton(
                         value: typeBottle,
                         hint: const Text("Entrez Le type de bouteille"),
-                        items: const <DropdownMenuItem<double>>[
+                        items: const <DropdownMenuItem<String>>[
                           DropdownMenuItem(
-                            value: 1.5,
-                            child: Text("1.5 L"),
+                            value: "Plastic",
+                            child: Text("Plastic"),
                           ),
                           DropdownMenuItem(
-                            value: 10,
-                            child: Text("10 L"),
+                            value: "Glass",
+                            child: Text("Glass"),
                           ),
                         ],
                         onChanged: (value) {
@@ -217,37 +218,31 @@ class _MyHomePageState extends State<MyHomePage>
                     borderRadius: BorderRadius.circular(40),
                     color: Colors.grey[350],
                   ),
-                  child: Row(children: [
-                    const Icon(
-                      Icons.circle_outlined,
-                      color: Colors.blue,
-                      size: 50,
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      icon: Icon(
+                        Icons.circle_outlined,
+                        color: Colors.blue,
+                        size: 50,
+                      ),
+                      border: InputBorder.none,
+                      hintText: "Enter the meeting point",
                     ),
-                    DropdownButton(
-                        value: meetingPoint,
-                        hint: const Text("Entrez Le point de rencontre"),
-                        items: const [
-                          DropdownMenuItem(
-                            value: "Ma position",
-                            child: Text("Ma position"),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            meetingPoint = value;
-                            debugPrint(meetingPoint);
-                          });
-                        })
-                  ]),
+                    onChanged: (value) {
+                      setState(() {
+                        meetingPoint = value;
+                      });
+                    },
+                  ),
                 ),
 
                 Container(
                   alignment: Alignment.center,
                   margin: const EdgeInsets.only(top: 60),
 //Validate
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Row(
+                      const Row(
                         children: [
                           Expanded(
                             child: ElevatedButton(
@@ -268,11 +263,13 @@ class _MyHomePageState extends State<MyHomePage>
                       ),
 //Cancel
                       ElevatedButton(
-                          style: ButtonStyle(
+                          style: const ButtonStyle(
                               backgroundColor:
                                   MaterialStatePropertyAll(Colors.white)),
-                          onPressed: null,
-                          child: Text("Cancel")),
+                          onPressed: () {
+                            setState(() {});
+                          },
+                          child: const Text("Cancel")),
                     ],
                   ),
                 ),
@@ -284,232 +281,229 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
-//Container de la page Des posts effectués
-  Container pagePost() {
-    double hauteurTab = 50;
-    return Container(
-      color: Colors.white,
-      child: Column(
-        children: [
-          Container(
-            height: hauteurTab,
-            child: TabBar(
-              controller: _controller,
-              tabs: const [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Public Feed",
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "My Feed",
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Container(
-            color: const Color.fromARGB(255, 207, 225, 240),
-            height: MediaQuery.sizeOf(context).height -
-                tailleBarreNavigation -
-                hauteurTab -
-                25,
-            width: MediaQuery.sizeOf(context).width,
-            child: TabBarView(
-              controller: _controller,
-              children: [
-                SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(children: [
-                    singlepost(
-                        'https://sm.ign.com/t/ign_fr/cover/a/avatar-gen/avatar-generations_bssq.300.jpg',
-                        "Daniel",
-                        'Yaoundé',
-                        10,
-                        20,
-                        "Boulan"),
-                    singlepost(
-                        'https://media-mcetv.ouest-france.fr/wp-content/uploads/2023/01/avatar-ces-indices-sur-la-veritable-nature-du-personnage-de-kiri-.jpg',
-                        "Daniel2",
-                        'Yaoundé',
-                        10,
-                        20,
-                        "Boulan"),
-                    singlepost('', "Daniel", 'Yaoundé', 10, 20, "Boulan"),
-                  ]),
-                ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(children: [
-                    singlepost('', "Daniel", 'Yaoundé', 10, 20, "Boulan"),
-                    singlepost('', "Daniel2", 'Yaoundé', 10, 20, "Boulan"),
-                  ]),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+// //Container de la page Des posts effectués
+//   Container pagePost() {
+//     double hauteurTab = 50;
+//     return Container(
+//       color: Colors.white,
+//       child: Column(
+//         children: [
+//           Container(
+//             height: hauteurTab,
+//             child: TabBar(
+//               controller: _controller,
+//               tabs: const [
+//                 Column(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     Text(
+//                       "Public Feed",
+//                       style:
+//                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+//                     ),
+//                   ],
+//                 ),
+//                 Column(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     Text(
+//                       "My Feed",
+//                       style:
+//                           TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+//                     ),
+//                   ],
+//                 ),
+//               ],
+//             ),
+//           ),
+//           Container(
+//             color: const Color.fromARGB(255, 207, 225, 240),
+//             height: MediaQuery.sizeOf(context).height -
+//                 tailleBarreNavigation -
+//                 hauteurTab -
+//                 25,
+//             width: MediaQuery.sizeOf(context).width,
+//             child: TabBarView(
+//               controller: _controller,
+//               children: [
+//                 SingleChildScrollView(
+//                   scrollDirection: Axis.vertical,
+//                   child: Column(children: [
+//                     singlepost(
+//                         'https://sm.ign.com/t/ign_fr/cover/a/avatar-gen/avatar-generations_bssq.300.jpg',
+//                         "Daniel",
+//                         'Yaoundé',
+//                         10,
+//                         20,
+//                         "Boulan"),
+//                     singlepost(
+//                         'https://media-mcetv.ouest-france.fr/wp-content/uploads/2023/01/avatar-ces-indices-sur-la-veritable-nature-du-personnage-de-kiri-.jpg',
+//                         "Daniel2",
+//                         'Yaoundé',
+//                         10,
+//                         20,
+//                         "Boulan"),
+//                   ]),
+//                 ),
+//                 const SingleChildScrollView(
+//                   scrollDirection: Axis.vertical,
+//                   child: Column(children: [
+//                     Text('efe'),
+//                   ]),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
 
-//Container publication
-  Widget singlepost(String avatar, String username, String userLocation,
-      double typeBottle, int quantity, String meetingpoint) {
-    return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20), color: Colors.white),
-      margin: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.indigo,
-              foregroundColor: Colors.white,
-              backgroundImage: NetworkImage(avatar),
-              radius: 30,
-              child: Text(
-                avatar.isEmpty ? username[0].toUpperCase() : '',
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-              ),
-            ),
-            title: Text(
-              username,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              userLocation,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Colors.blue),
-            ),
-            trailing: const Icon(
-              Icons.bookmark_outline,
-              color: Colors.blue,
-              size: 30,
-            ),
-          ),
-          Container(
-            margin:
-                const EdgeInsets.only(left: 80, right: 30, top: 10, bottom: 30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-//Type of bottle
-                const Text(
-                  "Type of Bottle",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 148, 123, 123),
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.sizeOf(context).width,
-                  height: 35,
-                  alignment: Alignment.centerLeft,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(40),
-                    color: Colors.grey[350],
-                  ),
-                  child: Text(
-                    '     ${typeBottle.toString()}',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-//Quantity
-                const Text(
-                  "Quantity",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 148, 123, 123),
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.sizeOf(context).width,
-                  height: 35,
-                  alignment: Alignment.centerLeft,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(40),
-                    color: Colors.grey[350],
-                  ),
-                  child: Text(
-                    '     ${quantity.toString()}',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-//meeting Point
-                const Text(
-                  "Meeting point",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 148, 123, 123),
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.sizeOf(context).width,
-                  height: 35,
-                  alignment: Alignment.centerLeft,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(40),
-                    color: Colors.grey[350],
-                  ),
-                  child: Text(
-                    '     $meetingpoint',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-//Remove or Contact
-
-                const Padding(
-                  padding: EdgeInsets.only(top: 30),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll(Colors.blue),
-                    ),
-                    onPressed: null,
-                    child: Text(
-                      "Contact",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+// //Container publication
+//   Widget singlepost(String avatar, String username, String userLocation,
+//       double typeBottle, int quantity, String meetingpoint) {
+//     return Container(
+//       decoration: BoxDecoration(
+//           borderRadius: BorderRadius.circular(20), color: Colors.white),
+//       margin: const EdgeInsets.all(20),
+//       child: Column(
+//         children: [
+//           ListTile(
+//             leading: CircleAvatar(
+//               backgroundColor: Colors.indigo,
+//               foregroundColor: Colors.white,
+//               backgroundImage: NetworkImage(avatar),
+//               radius: 30,
+//               child: Text(
+//                 avatar.isEmpty ? username[0].toUpperCase() : '',
+//                 style:
+//                     const TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+//               ),
+//             ),
+//             title: Text(
+//               username,
+//               style: const TextStyle(fontWeight: FontWeight.bold),
+//             ),
+//             subtitle: Text(
+//               userLocation,
+//               style: const TextStyle(
+//                   fontWeight: FontWeight.bold, color: Colors.blue),
+//             ),
+//             trailing: const Icon(
+//               Icons.bookmark_outline,
+//               color: Colors.blue,
+//               size: 30,
+//             ),
+//           ),
+//           Container(
+//             margin:
+//                 const EdgeInsets.only(left: 80, right: 30, top: 10, bottom: 30),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+// //Type of bottle
+//                 const Text(
+//                   "Type of Bottle",
+//                   style: TextStyle(
+//                     fontSize: 20,
+//                     fontWeight: FontWeight.bold,
+//                     color: Color.fromARGB(255, 148, 123, 123),
+//                   ),
+//                 ),
+//                 Container(
+//                   width: MediaQuery.sizeOf(context).width,
+//                   height: 35,
+//                   alignment: Alignment.centerLeft,
+//                   decoration: BoxDecoration(
+//                     borderRadius: BorderRadius.circular(40),
+//                     color: Colors.grey[350],
+//                   ),
+//                   child: Text(
+//                     '     ${typeBottle.toString()}',
+//                     style: const TextStyle(
+//                       fontSize: 20,
+//                       fontWeight: FontWeight.bold,
+//                       color: Colors.blue,
+//                     ),
+//                   ),
+//                 ),
+// //Quantity
+//                 const Text(
+//                   "Quantity",
+//                   style: TextStyle(
+//                     fontSize: 20,
+//                     fontWeight: FontWeight.bold,
+//                     color: Color.fromARGB(255, 148, 123, 123),
+//                   ),
+//                 ),
+//                 Container(
+//                   width: MediaQuery.sizeOf(context).width,
+//                   height: 35,
+//                   alignment: Alignment.centerLeft,
+//                   decoration: BoxDecoration(
+//                     borderRadius: BorderRadius.circular(40),
+//                     color: Colors.grey[350],
+//                   ),
+//                   child: Text(
+//                     '     ${quantity.toString()}',
+//                     style: const TextStyle(
+//                       fontSize: 20,
+//                       fontWeight: FontWeight.bold,
+//                       color: Colors.blue,
+//                     ),
+//                   ),
+//                 ),
+// //meeting Point
+//                 const Text(
+//                   "Meeting point",
+//                   style: TextStyle(
+//                     fontSize: 20,
+//                     fontWeight: FontWeight.bold,
+//                     color: Color.fromARGB(255, 148, 123, 123),
+//                   ),
+//                 ),
+//                 Container(
+//                   width: MediaQuery.sizeOf(context).width,
+//                   height: 35,
+//                   alignment: Alignment.centerLeft,
+//                   decoration: BoxDecoration(
+//                     borderRadius: BorderRadius.circular(40),
+//                     color: Colors.grey[350],
+//                   ),
+//                   child: Text(
+//                     '     $meetingpoint',
+//                     style: const TextStyle(
+//                       fontSize: 20,
+//                       fontWeight: FontWeight.bold,
+//                       color: Colors.blue,
+//                     ),
+//                   ),
+//                 ),
+// //Remove or Contact
+//                 const Padding(
+//                   padding: EdgeInsets.only(top: 30),
+//                   child: ElevatedButton(
+//                     style: ButtonStyle(
+//                       backgroundColor: MaterialStatePropertyAll(Colors.blue),
+//                     ),
+//                     onPressed: null,
+//                     child: Text(
+//                       "Contact",
+//                       style: TextStyle(
+//                         color: Colors.white,
+//                         fontWeight: FontWeight.bold,
+//                         fontSize: 20,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
 
   @override
   Widget build(BuildContext context) {
