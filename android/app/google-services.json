@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "422488101360",
+    "project_id": "kalan-9a684",
+    "storage_bucket": "kalan-9a684.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:422488101360:android:6cec6d6fcac7e34bad0d35",
+        "android_client_info": {
+          "package_name": "com.example.gdsc_1_win"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_bJZkL97sLDIFbPsJPjrKUQbNzRMaMVI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:422488101360:android:ddc1228fe46d82a0ad0d35",
+        "android_client_info": {
+          "package_name": "com.example.kalan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_bJZkL97sLDIFbPsJPjrKUQbNzRMaMVI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

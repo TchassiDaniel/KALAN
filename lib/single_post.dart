@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SinglePost extends StatefulWidget {
   final double tailleBarreNavigation;
@@ -13,11 +14,34 @@ class SinglePost extends StatefulWidget {
 
 class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
   late TabController _controller;
-
+  List<Widget> listPosts = [];
+  //On enregistre la les donnees de la base de donnée
   @override
   void initState() {
     super.initState();
     _controller = TabController(length: 2, vsync: this);
+    // Firebase.initializeApp().whenComplete(() {
+    //   debugPrint("completed");
+    //   setState(() {});
+    // });
+    //Recupération des données dans la base utilisateur
+    getAllPosts();
+  }
+
+  Future<void> getAllPosts() async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('posts').get();
+    List<QueryDocumentSnapshot> allPosts = querySnapshot.docs;
+
+    for (var post in allPosts) {
+      // Utilisez les données comme vous le souhaitez, par exemple, en les envoyant à la fonction SinglePost
+      listPosts.add(singlepost('', 'DAn', "localisation", post['bottle type'],
+          post['quantity'], post["meetingpoint"]));
+      debugPrint(post.toString());
+    }
+    setState(() {
+      //Mise à jour de l'affichage
+    });
   }
 
 //Container de la page Des posts effectués
@@ -56,7 +80,7 @@ class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
             ),
           ),
           Container(
-            color: Color.fromARGB(255, 219, 234, 250),
+            color: const Color.fromARGB(255, 219, 234, 250),
             height: MediaQuery.sizeOf(context).height -
                 widget.tailleBarreNavigation -
                 hauteurTab -
@@ -67,22 +91,7 @@ class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
               children: [
                 SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  child: Column(children: [
-                    singlepost(
-                        'https://sm.ign.com/t/ign_fr/cover/a/avatar-gen/avatar-generations_bssq.300.jpg',
-                        "Daniel",
-                        'Yaoundé',
-                        10,
-                        20,
-                        "Boulan"),
-                    singlepost(
-                        'https://media-mcetv.ouest-france.fr/wp-content/uploads/2023/01/avatar-ces-indices-sur-la-veritable-nature-du-personnage-de-kiri-.jpg',
-                        "Daniel2",
-                        'Yaoundé',
-                        10,
-                        20,
-                        "Boulan"),
-                  ]),
+                  child: Column(children: listPosts),
                 ),
                 const SingleChildScrollView(
                   scrollDirection: Axis.vertical,
@@ -100,7 +109,7 @@ class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
 
 //Container publication
   Widget singlepost(String avatar, String username, String userLocation,
-      double typeBottle, int quantity, String meetingpoint) {
+      String typeBottle, int quantity, String meetingpoint) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
