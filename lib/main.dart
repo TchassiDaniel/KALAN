@@ -41,7 +41,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   int indexElementBarreNavigation = 1;
+
   double tailleBarreNavigation = 100;
+
   late Widget mainContent;
 
   @override
