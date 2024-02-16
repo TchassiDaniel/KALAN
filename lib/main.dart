@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:gdsc_1_win/single_post.dart';
 import 'package:gdsc_1_win/page_new_post.dart';
+import 'package:gdsc_1_win/map.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,7 +54,9 @@ class _MyHomePageState extends State<MyHomePage>
 
 //Gestionnaire de passage entre écran
   void navigator() {
-    if (indexElementBarreNavigation == 1) {
+    if (indexElementBarreNavigation == 0) {
+      mainContent = MapWidget();
+    } else if (indexElementBarreNavigation == 1) {
       mainContent = PageNewPost();
     } else if (indexElementBarreNavigation == 2) {
       mainContent = SinglePost(

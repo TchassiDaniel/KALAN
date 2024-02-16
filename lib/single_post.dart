@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SinglePost extends StatefulWidget {
   final double tailleBarreNavigation;
 
   // const SinglePost({Key? key}) : super(key: key);
 
-  SinglePost({required this.tailleBarreNavigation});
+  const SinglePost({super.key, required this.tailleBarreNavigation});
 
   @override
-  _SinglePostState createState() => _SinglePostState();
+  State<SinglePost> createState() => _SinglePostState();
 }
 
 class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
@@ -35,7 +37,21 @@ class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
 
     for (var post in allPosts) {
       // Utilisez les données comme vous le souhaitez, par exemple, en les envoyant à la fonction SinglePost
-      listPosts.add(singlepost('', 'DAn', "localisation", post['bottle type'],
+      GeoPoint localisation =
+          post["localisation"]; //On récupère les donnée de localisation
+      String pos;
+      //Recupération des lieux approximatifs
+      final response = await http.get(
+        Uri.parse(
+            'https://nominatim.openstreetmap.org/reverse?format=json&lat=${localisation.latitude}&lon=${localisation.longitude}'),
+      );
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        pos = result['display_name'];
+      } else {
+        throw Exception('Failed to fetch place name');
+      }
+      listPosts.add(singlepost('', 'DAn', pos, post['bottle type'],
           post['quantity'], post["meetingpoint"]));
       debugPrint(post.toString());
     }

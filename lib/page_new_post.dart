@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 
 class PageNewPost extends StatefulWidget {
+  const PageNewPost({super.key});
+
   @override
-  _PageNewPostState createState() => _PageNewPostState();
+  State<PageNewPost> createState() => _PageNewPostState();
 }
 
 class _PageNewPostState extends State<PageNewPost> {
@@ -11,27 +14,38 @@ class _PageNewPostState extends State<PageNewPost> {
   String? localisation;
   int? quantite;
   String? meetingPoint;
+  late Position currentPosition;
 
   final formkey = GlobalKey<FormState>();
-  double hauteurElements = 55;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      currentPosition = position;
+    });
+  }
 
   void validationForm() async {
     if (formkey.currentState!.validate()) {
       formkey.currentState!.save();
-
+      GeoPoint location =
+          GeoPoint(currentPosition.latitude, currentPosition.longitude);
       Map<String, dynamic> data = {
         'bottle type': typeBottle,
         'quantity': quantite,
-        'localisation': localisation,
+        'localisation': location,
         "meetingpoint": meetingPoint,
       };
 
       await FirebaseFirestore.instance.collection('posts').add(data);
-      localisation = null;
-      quantite = null;
-      typeBottle = null;
+
       formkey.currentState!.reset();
-      setState(() {});
     }
   }
 
@@ -99,7 +113,6 @@ class _PageNewPostState extends State<PageNewPost> {
                       ),
                       Expanded(
                         child: DropdownButtonFormField(
-                          
                             validator: (value) => value!.isEmpty
                                 ? "Validez votre position"
                                 : null,
@@ -110,21 +123,14 @@ class _PageNewPostState extends State<PageNewPost> {
                                 const InputDecoration(border: InputBorder.none),
                             items: const [
                               DropdownMenuItem(
-                                value: "Ma position",
-                                child: Text("Ma position"),
-                              ),
-                              DropdownMenuItem(
-                                value: "Ma position1",
-                                child: Text("Ma position1"),
-                              ),
-                              DropdownMenuItem(
-                                value: "Ma positionA",
-                                child: Text("Ma positionA"),
+                                value: "My position",
+                                child: Text("My position"),
                               ),
                             ],
                             onChanged: (value) {
                               setState(() {
                                 localisation = value.toString();
+                                getCurrentLocation();
                               });
                             }),
                       )
@@ -205,10 +211,13 @@ class _PageNewPostState extends State<PageNewPost> {
                             hint: const Text("quantité de bouteille:"),
                             decoration:
                                 const InputDecoration(border: InputBorder.none),
-                            items: const <DropdownMenuItem<int>>[
-                              DropdownMenuItem(value: 10, child: Text("10")),
-                              DropdownMenuItem(value: 20, child: Text("20")),
-                            ],
+                            items: List.generate(1000, (index) => index + 1)
+                                .map((int value) {
+                              return DropdownMenuItem<int>(
+                                value: value,
+                                child: Text(value.toString()),
+                              );
+                            }).toList(),
                             onChanged: (value) {
                               setState(() {
                                 debugPrint("Hello");
@@ -284,9 +293,6 @@ class _PageNewPostState extends State<PageNewPost> {
                                     MaterialStatePropertyAll(Colors.white)),
                             onPressed: () {
                               setState(() {
-                                localisation = null;
-                                quantite = null;
-                                typeBottle = null;
                                 formkey.currentState!.reset();
                               });
                             },
