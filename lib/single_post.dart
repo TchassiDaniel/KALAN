@@ -31,14 +31,16 @@ class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
   }
 
   Future<void> getAllPosts() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('posts').get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('posts')
+        .orderBy('Timetamp', descending: true)
+        .get();
     List<QueryDocumentSnapshot> allPosts = querySnapshot.docs;
 
     for (var post in allPosts) {
       // Utilisez les données comme vous le souhaitez, par exemple, en les envoyant à la fonction SinglePost
-      GeoPoint localisation =
-          post["localisation"]; //On récupère les donnée de localisation
+      //On récupère les donnée de localisation
+      GeoPoint localisation = post["localisation"];
       String pos;
       //Recupération des lieux approximatifs
       final response = await http.get(

@@ -41,6 +41,7 @@ class _PageNewPostState extends State<PageNewPost> {
         'quantity': quantite,
         'localisation': location,
         "meetingpoint": meetingPoint,
+        "Timetamp": FieldValue.serverTimestamp(),
       };
 
       await FirebaseFirestore.instance.collection('posts').add(data);

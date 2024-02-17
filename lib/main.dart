@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:gdsc_1_win/login.dart';
+import 'package:gdsc_1_win/signIn.dart';
 import 'firebase_options.dart';
 import 'package:gdsc_1_win/single_post.dart';
 import 'package:gdsc_1_win/page_new_post.dart';
@@ -55,9 +57,9 @@ class _MyHomePageState extends State<MyHomePage>
 //Gestionnaire de passage entre écran
   void navigator() {
     if (indexElementBarreNavigation == 0) {
-      mainContent = MapWidget();
+      mainContent = const MapWidget();
     } else if (indexElementBarreNavigation == 1) {
-      mainContent = PageNewPost();
+      mainContent = const SignIn(); //PageNewPost();
     } else if (indexElementBarreNavigation == 2) {
       mainContent = SinglePost(
         tailleBarreNavigation: tailleBarreNavigation,
@@ -534,10 +536,13 @@ class _MyHomePageState extends State<MyHomePage>
     return Scaffold(
       body: SafeArea(
         child: Container(
+          alignment: Alignment.center,
           color: const Color.fromARGB(255, 161, 206, 243),
           child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: mainContent,
+            //physics: const NeverScrollableScrollPhysics(),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [mainContent]),
           ),
         ),
       ),
