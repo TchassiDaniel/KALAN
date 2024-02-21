@@ -41,7 +41,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   int indexElementBarreNavigation = 0;
-
   double tailleBarreNavigation = 80;
 
   late Widget mainContent;
@@ -142,14 +141,3 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 }
-
-// class CustomTabcontroller extends TabController{
-  
-//   CustomTabcontroller({int initialIndex = 0, @required int lenght}):
-//   super(initialIndex: initialIndex, length: lenght);
-
-//   @override
-//   void dispose(){
-
-//   }
-// }
