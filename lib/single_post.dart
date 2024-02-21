@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gdsc_1_win/login.dart';
+import 'package:gdsc_1_win/one_post.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SinglePost extends StatefulWidget {
   final double tailleBarreNavigation;
@@ -17,17 +21,45 @@ class SinglePost extends StatefulWidget {
 class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
   late TabController _controller;
   List<Widget> listPosts = [];
+  List<Widget> listPostsUserAndFavorite = [];
+
+  String userID = "";
   //On enregistre la les donnees de la base de donnée
   @override
   void initState() {
     super.initState();
     _controller = TabController(length: 2, vsync: this);
-    // Firebase.initializeApp().whenComplete(() {
-    //   debugPrint("completed");
-    //   setState(() {});
-    // });
     //Recupération des données dans la base utilisateur
+    loadUserID();
     getAllPosts();
+  }
+
+  Future<void> loadUserID() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userID = prefs.getString('UserID') ?? "";
+    });
+
+    if (userID == "") {
+      // ignore: use_build_context_synchronously
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (Route<dynamic> route) => false,
+      );
+    }
+  }
+
+  Future<List<String>> getUserIdentity(String userID) async {
+    String firstName = '';
+    String lastName = '';
+    DocumentSnapshot document =
+        await FirebaseFirestore.instance.collection('users').doc(userID).get();
+    if (document.exists) {
+      firstName = document['First_name'];
+      lastName = document['Last_name'];
+    }
+    return [firstName, lastName];
   }
 
   Future<void> getAllPosts() async {
@@ -53,13 +85,42 @@ class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
       } else {
         throw Exception('Failed to fetch place name');
       }
-      listPosts.add(singlepost('', 'DAn', pos, post['bottle type'],
-          post['quantity'], post["meetingpoint"]));
-      debugPrint(post.toString());
+      //On recupere le nom et prenom de l'utilisateur
+      String userIDPost = post['UserID'];
+
+
+      DocumentSnapshot document = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userIDPost)
+          .get();
+
+      Widget apost = OnePost(
+        firstName: document['First_name'],
+        lastName: document['Last_name'],
+        userLocation: pos,
+        typeBottle: post['bottle type'],
+        quantity: post['quantity'],
+        meetingPoint: post["meetingpoint"],
+        userID: userIDPost,
+        phoneNumber: document['Phone_number'],
+        reloadFunction: reload,
+      );
+      listPosts.add(apost);
+
+      if (post["UserID"] == userID) {
+        listPostsUserAndFavorite.add(apost);
+      }
     }
     setState(() {
       //Mise à jour de l'affichage
     });
+  }
+
+//On va recharger le container en cas de suppression d'élément surtout
+  void reload() {
+    listPosts.clear();
+    listPostsUserAndFavorite.clear();
+    getAllPosts();
   }
 
 //Container de la page Des posts effectués
@@ -111,167 +172,9 @@ class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
                   scrollDirection: Axis.vertical,
                   child: Column(children: listPosts),
                 ),
-                const SingleChildScrollView(
+                SingleChildScrollView(
                   scrollDirection: Axis.vertical,
-                  child: Column(children: [
-                    Text('efe'),
-                  ]),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-//Container publication
-  Widget singlepost(String avatar, String username, String userLocation,
-      String typeBottle, int quantity, String meetingpoint) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.white,
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.grey,
-            blurRadius: 10.0,
-            spreadRadius: 2.0,
-            offset: Offset(5, 5),
-          ),
-        ],
-      ),
-      margin: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.indigo,
-              foregroundColor: Colors.white,
-              backgroundImage: NetworkImage(avatar),
-              radius: 30,
-              child: Text(
-                avatar.isEmpty ? username[0].toUpperCase() : '',
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
-              ),
-            ),
-            title: Text(
-              username,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(
-              userLocation,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, color: Colors.blue),
-            ),
-            trailing: const Icon(
-              Icons.bookmark_outline,
-              color: Colors.blue,
-              size: 30,
-            ),
-          ),
-          Container(
-            margin:
-                const EdgeInsets.only(left: 80, right: 30, top: 10, bottom: 30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-//Type of bottle
-                const Text(
-                  "Type of Bottle",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 148, 123, 123),
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.sizeOf(context).width,
-                  height: 35,
-                  alignment: Alignment.centerLeft,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(40),
-                    color: Colors.grey[350],
-                  ),
-                  child: Text(
-                    '     ${typeBottle.toString()}',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-//Quantity
-                const Text(
-                  "Quantity",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 148, 123, 123),
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.sizeOf(context).width,
-                  height: 35,
-                  alignment: Alignment.centerLeft,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(40),
-                    color: Colors.grey[350],
-                  ),
-                  child: Text(
-                    '     ${quantity.toString()}',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-//meeting Point
-                const Text(
-                  "Meeting point",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 148, 123, 123),
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.sizeOf(context).width,
-                  height: 35,
-                  alignment: Alignment.centerLeft,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(40),
-                    color: Colors.grey[350],
-                  ),
-                  child: Text(
-                    '     $meetingpoint',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue,
-                    ),
-                  ),
-                ),
-//Remove or Contact
-                const Padding(
-                  padding: EdgeInsets.only(top: 30),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll(Colors.blue),
-                    ),
-                    onPressed: null,
-                    child: Text(
-                      "Contact",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
+                  child: Column(children: listPostsUserAndFavorite),
                 ),
               ],
             ),

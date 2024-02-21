@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gdsc_1_win/login.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PageNewPost extends StatefulWidget {
   const PageNewPost({super.key});
@@ -17,10 +19,28 @@ class _PageNewPostState extends State<PageNewPost> {
   late Position currentPosition;
 
   final formkey = GlobalKey<FormState>();
+  String userID = "";
 
   @override
   void initState() {
     super.initState();
+    loadUserIdentity();
+  }
+
+  void loadUserIdentity() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userID = prefs.getString('UserID') ?? "";
+    });
+
+    if (userID == "") {
+      // ignore: use_build_context_synchronously
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (Route<dynamic> route) => false,
+      );
+    }
   }
 
   Future getCurrentLocation() async {
@@ -29,6 +49,38 @@ class _PageNewPostState extends State<PageNewPost> {
     setState(() {
       currentPosition = position;
     });
+  }
+
+  void showMessage(BuildContext context, bool type, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            type == true ? 'Success' : 'Error',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                //Si type est true alors message de joie
+                color: type == true ? Colors.green : Colors.red,
+                fontSize: 50,
+                fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 30),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK', style: TextStyle(fontSize: 30)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void validationForm() async {
@@ -42,10 +94,19 @@ class _PageNewPostState extends State<PageNewPost> {
         'localisation': location,
         "meetingpoint": meetingPoint,
         "Timetamp": FieldValue.serverTimestamp(),
+        "UserID": userID,
       };
 
-      await FirebaseFirestore.instance.collection('posts').add(data);
-
+      try {
+        await FirebaseFirestore.instance.collection('posts').add(data);
+        // ignore: use_build_context_synchronously
+        showMessage(context, true, 'Post added successfully');
+        // Autres actions à effectuer si l'ajout a été réussi
+      } catch (e) {
+        // ignore: use_build_context_synchronously
+        showMessage(context, false, 'Error adding post: $e');
+        // Gérer l'erreur, par exemple afficher un message à l'utilisateur
+      }
       formkey.currentState!.reset();
     }
   }
