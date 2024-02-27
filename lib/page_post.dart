@@ -7,18 +7,18 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SinglePost extends StatefulWidget {
+class PagePost extends StatefulWidget {
   final double tailleBarreNavigation;
 
-  // const SinglePost({Key? key}) : super(key: key);
+  // const PagePost({Key? key}) : super(key: key);
 
-  const SinglePost({super.key, required this.tailleBarreNavigation});
+  const PagePost({super.key, required this.tailleBarreNavigation});
 
   @override
-  State<SinglePost> createState() => _SinglePostState();
+  State<PagePost> createState() => _PagePostState();
 }
 
-class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
+class _PagePostState extends State<PagePost> with TickerProviderStateMixin {
   late TabController _controller;
   List<Widget> listPosts = [];
   List<Widget> listPostsUserAndFavorite = [];
@@ -29,7 +29,7 @@ class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _controller = TabController(length: 2, vsync: this);
-    //Recupération des données dans la base utilisateur
+    //Loading of all required data to be displayed
     loadUserID();
     getAllPosts();
   }
@@ -70,7 +70,7 @@ class _SinglePostState extends State<SinglePost> with TickerProviderStateMixin {
     List<QueryDocumentSnapshot> allPosts = querySnapshot.docs;
 
     for (var post in allPosts) {
-      // Utilisez les données comme vous le souhaitez, par exemple, en les envoyant à la fonction SinglePost
+      // Utilisez les données comme vous le souhaitez, par exemple, en les envoyant à la fonction PagePost
       //On récupère les donnée de localisation
       GeoPoint localisation = post["localisation"];
       String pos;

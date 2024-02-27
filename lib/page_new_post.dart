@@ -68,7 +68,7 @@ class _PageNewPostState extends State<PageNewPost> {
           content: Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 30),
+            style: const TextStyle(fontSize: 30),
           ),
           actions: <Widget>[
             TextButton(
@@ -116,7 +116,7 @@ class _PageNewPostState extends State<PageNewPost> {
     return Form(
       key: formkey,
       child: Container(
-        height: MediaQuery.sizeOf(context).height - 270,
+        height: MediaQuery.sizeOf(context).height,
         width: MediaQuery.sizeOf(context).width,
         decoration: const BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(20)),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:gdsc_1_win/sign_in.dart';
 import 'firebase_options.dart';
-import 'package:gdsc_1_win/single_post.dart';
+import 'package:gdsc_1_win/page_post.dart';
 import 'package:gdsc_1_win/page_new_post.dart';
 import 'package:gdsc_1_win/map.dart';
 
@@ -40,7 +40,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
+  //Current Index in BottomNavigationBar
   int indexElementBarreNavigation = 0;
+  //Size of BottomNavigationBar
   double tailleBarreNavigation = 80;
 
   late Widget mainContent;
@@ -50,14 +52,14 @@ class _MyHomePageState extends State<MyHomePage>
     super.initState();
   }
 
-//Gestionnaire de passage entre écran
+//This function permit us to change the content of the page
   void navigator() {
     if (indexElementBarreNavigation == 0) {
       mainContent = const MapWidget();
     } else if (indexElementBarreNavigation == 1) {
       mainContent = const PageNewPost();
     } else if (indexElementBarreNavigation == 2) {
-      mainContent = SinglePost(
+      mainContent = PagePost(
         tailleBarreNavigation: tailleBarreNavigation,
       );
     }
@@ -65,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   Widget build(BuildContext context) {
+    //We load the initial content
     navigator();
     return Scaffold(
       body: SafeArea(
@@ -83,6 +86,7 @@ class _MyHomePageState extends State<MyHomePage>
         height: tailleBarreNavigation,
         child: BottomNavigationBar(
           items: [
+            //Map
             const BottomNavigationBarItem(
               icon: Icon(
                 Icons.map_outlined,
@@ -91,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage>
               ),
               label: "Map",
             ),
+            //New post
             const BottomNavigationBarItem(
               icon: Icon(
                 Icons.add_box_sharp,
@@ -99,6 +104,7 @@ class _MyHomePageState extends State<MyHomePage>
               ),
               label: "New post",
             ),
+            //List of posts
             const BottomNavigationBarItem(
               icon: Icon(
                 Icons.list_alt,
@@ -107,6 +113,7 @@ class _MyHomePageState extends State<MyHomePage>
               ),
               label: 'List of posts',
             ),
+            //Settings
             BottomNavigationBarItem(
                 activeIcon: Column(
                   children: [

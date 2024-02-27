@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:gdsc_1_win/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-//import 'package:fluttertoast/fluttertoast.dart';
+
+//This class permit us to construct a resume about a post
 
 class OnePost extends StatefulWidget {
   final String firstName;
@@ -42,6 +43,9 @@ class _OnePostState extends State<OnePost> {
     loadUserID();
   }
 
+//We load the user ID
+//Normally it is in the shared preferences
+//But if it is not, we redirect to the login page
   Future<void> loadUserID() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -58,6 +62,8 @@ class _OnePostState extends State<OnePost> {
     }
   }
 
+  //To delete a post if the users click on remove button
+  //If an error occurs, we display an error message
   Future<void> deletePost() async {
     try {
       final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -77,15 +83,16 @@ class _OnePostState extends State<OnePost> {
         }
       } else {
         // ignore: use_build_context_synchronously
-        showMessage(context, 'Please reload application');
+        showMessage('Please reload application');
       }
     } catch (e) {
       // ignore: use_build_context_synchronously
-      showMessage(context, 'Error deleting record: $e');
+      showMessage('Error deleting record');
     }
   }
 
-  void showMessage(BuildContext context, String message) {
+//To display an error message if an error occurs
+  void showMessage(String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -114,16 +121,18 @@ class _OnePostState extends State<OnePost> {
     );
   }
 
+//To open the phone if the user click on contact
   void openPhone(BuildContext context) async {
     Uri phoneNumber = Uri.parse('tel:${widget.phoneNumber}');
     if (await launchUrl(phoneNumber)) {
       // dialer is open
     } else {
       // ignore: use_build_context_synchronously
-      showMessage(context, 'Unable to open dialer');
+      showMessage('Unable to open dialer');
     }
   }
 
+//To display the "remove" or "contact" button depending on the user
   Widget removeOrContact() {
     //Remove
     if (userID == widget.userID) {
@@ -141,7 +150,9 @@ class _OnePostState extends State<OnePost> {
           ),
         ),
       );
-    } else {
+    }
+    //Contact
+    else {
       return ElevatedButton(
         style: const ButtonStyle(
           backgroundColor: MaterialStatePropertyAll(Colors.blue),
